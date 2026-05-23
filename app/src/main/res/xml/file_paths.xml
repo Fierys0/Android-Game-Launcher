@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Basic external storage access -->
+    <external-path name="external_root" path="."/>
+
+    <!-- Specific for Downloads folder -->
+    <external-path name="my_downloads" path="Download/"/>
+
+    <!-- Access to app's own external storage -->
+    <external-files-path name="app_external_files" path="."/>
+
+    <!-- Access to internal files just in case -->
+    <files-path name="internal_files" path="."/>
+</paths>

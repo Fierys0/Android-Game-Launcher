@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_games">
+
+    <fragment
+        android:id="@+id/navigation_games"
+        android:name="com.example.fumbogamelauncher.ui.GamesFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_games" />
+
+    <fragment
+        android:id="@+id/navigation_library"
+        android:name="com.example.fumbogamelauncher.ui.LibraryFragment"
+        android:label="Library"
+        tools:layout="@layout/layout_library_list" />
+
+    <fragment
+        android:id="@+id/navigation_wishlist"
+        android:name="com.example.fumbogamelauncher.ui.WishlistFragment"
+        android:label="Wishlist"
+        tools:layout="@layout/layout_library_list" />
+
+    <fragment
+        android:id="@+id/navigation_account"
+        android:name="com.example.fumbogamelauncher.ui.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="com.example.fumbogamelauncher.ui.SettingsFragment"
+        android:label="Settings"
+        tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/navigation_about"
+        android:name="com.example.fumbogamelauncher.ui.PlaceholderFragment"
+        android:label="About"
+        tools:layout="@layout/fragment_placeholder">
+        <argument android:name="arg_title" android:defaultValue="About Fumbo Launcher" />
+    </fragment>
+</navigation>
