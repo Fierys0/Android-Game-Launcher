@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import com.example.fumbogamelauncher.databinding.FragmentProfileBinding
 
 /**
- * [Fragment & Lifecycle]: Fragment displaying dummy profile data with interactive buttons.
+ * [Fragment dan Lifecycle]: Fragmen modular untuk menampilkan profil pengguna dan statistik.
  */
 class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
@@ -20,6 +20,7 @@ class ProfileFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // [Slicing UI]: Menggunakan ViewBinding untuk memisahkan desain XML dengan kode.
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -27,25 +28,27 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        // [Lifecycle]: Menambahkan listener untuk interaksi pada komponen UI.
         binding.btnEditProfile.setOnClickListener {
-            Toast.makeText(context, "Editing Profile...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Mengedit Profil...", Toast.LENGTH_SHORT).show()
         }
         
         binding.btnPayment.setOnClickListener {
-            Toast.makeText(context, "Opening Payment Methods...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Metode Pembayaran...", Toast.LENGTH_SHORT).show()
         }
         
         binding.btnSecurity.setOnClickListener {
-            Toast.makeText(context, "Privacy & Security Settings...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Pengaturan Keamanan...", Toast.LENGTH_SHORT).show()
         }
         
         binding.btnLogout.setOnClickListener {
-            Toast.makeText(context, "Signing out...", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Keluar dari aplikasi...", Toast.LENGTH_LONG).show()
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // [Lifecycle]: Membersihkan referensi binding saat view dihancurkan.
         _binding = null
     }
 }

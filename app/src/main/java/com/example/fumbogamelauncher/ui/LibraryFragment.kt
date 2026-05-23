@@ -11,7 +11,7 @@ import com.example.fumbogamelauncher.model.Game
 import com.example.fumbogamelauncher.model.GameCategory
 
 /**
- * [Fragment & Lifecycle]: Fragment displaying the user's game library.
+ * [Fragment dan Lifecycle]: Fragmen modular untuk menampilkan koleksi game yang terinstal.
  */
 class LibraryFragment : Fragment() {
     private var _binding: LayoutLibraryListBinding? = null
@@ -22,16 +22,19 @@ class LibraryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // [Slicing UI]: Memuat antarmuka XML menggunakan ViewBinding.
         _binding = LayoutLibraryListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // [Lifecycle]: Melakukan setup daftar game setelah view tersedia.
         setupRecyclerView()
     }
 
     private fun setupRecyclerView() {
+        // Data dummy untuk koleksi game pengguna.
         val games = listOf(
             Game(101, "After Bloom", "Game petualangan indah buatan developer lokal.", GameCategory.ADVENTURE, "placeholder", "https://github.com/Fierys0/AfterBloom/releases/download/DEBUG_V0.1/AfterBloom_Android_x64_ALLABI.apk", "com.miruku.afterbloom"),
             Game(3, "Valorant", "", GameCategory.ACTION, "valorant"),
@@ -42,12 +45,14 @@ class LibraryFragment : Fragment() {
             Game(6, "Dota 2", "", GameCategory.STRATEGY, "dota2")
         )
 
+        // [Slicing UI]: Mengatur tata letak grid dan menghubungkan adapter game.
         binding.rvLibrary.layoutManager = GridLayoutManager(requireContext(), 2)
-        binding.rvLibrary.adapter = GamesAdapter(games)
+        binding.rvLibrary.adapter = GamesAdapter(games, GamesAdapter.TYPE_GRID)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // [Lifecycle]: Membersihkan binding untuk mencegah kebocoran memori.
         _binding = null
     }
 }

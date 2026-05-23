@@ -18,7 +18,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * [Material Design 3 Components]: Detail view with TopAppBar, Dialog, Snackbar, and Bottom Sheet.
+ * [Material Design 3 Components]: Aktivitas detail game dengan TopAppBar, Dialog, Snackbar, dan Bottom Sheet.
  */
 class GameDetailActivity : AppCompatActivity() {
 
@@ -29,9 +29,11 @@ class GameDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // [Slicing UI]: Menggunakan ViewBinding untuk layout activity_game_detail.
         binding = ActivityGameDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // [Advanced Navigation]: Menerima data game secara aman melalui serializable extra.
         val game = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getSerializableExtra(EXTRA_GAME, Game::class.java)
         } else {
@@ -46,10 +48,12 @@ class GameDetailActivity : AppCompatActivity() {
             finish()
         }
 
+        // [Material Design 3 Components]: Navigasi kembali melalui TopAppBar (MaterialToolbar).
         binding.toolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
         
+        // [Lifecycle]: Aksi membatalkan unduhan saat tombol silang ditekan.
         binding.btnCancelDownload.setOnClickListener {
             if (currentDownloadId != -1L) {
                 DownloadHelper.cancelDownload(this, currentDownloadId)
@@ -62,6 +66,7 @@ class GameDetailActivity : AppCompatActivity() {
     }
 
     private fun setupUI(game: Game) {
+        // [Slicing UI]: Menghubungkan data model dengan komponen UI dari file dimens.xml dan colors.xml.
         binding.tvDetailTitle.text = game.title
         binding.tvDetailDesc.text = game.description
         binding.tvDetailCategory.text = game.category.name
@@ -78,7 +83,7 @@ class GameDetailActivity : AppCompatActivity() {
 
         updateLaunchButton(game)
 
-        // [Bottom Sheet]: Show extra options
+        // [Bottom Sheet]: Menampilkan menu opsi tambahan tanpa berpindah halaman.
         binding.btnOptions.setOnClickListener {
             showOptionsBottomSheet(game)
         }
@@ -87,14 +92,16 @@ class GameDetailActivity : AppCompatActivity() {
     private fun updateLaunchButton(game: Game) {
         val packageName = game.packageName
         if (packageName != null) {
+            // [Advanced Navigation]: Memeriksa status instalasi game di sistem secara dinamis.
             if (DownloadHelper.isAppInstalled(this, packageName)) {
                 binding.btnLaunch.text = "LAUNCH GAME"
                 binding.btnLaunch.setOnClickListener {
                     DownloadHelper.launchApp(this, packageName)
-                    // [Snackbar]: Short feedback
-                    Snackbar.make(binding.root, "Launching ${game.title}...", Snackbar.LENGTH_SHORT).show()
+                    // [Snackbar]: Memberikan feedback singkat setelah game diluncurkan.
+                    Snackbar.make(binding.root, "Meluncurkan ${game.title}...", Snackbar.LENGTH_SHORT).show()
                 }
             } else if (game.downloadUrl != null) {
+                // [Material Design 3 Components]: Mengubah tombol menjadi Download jika belum terinstal.
                 binding.btnLaunch.text = "DOWNLOAD"
                 binding.btnLaunch.setOnClickListener {
                     currentDownloadId = DownloadHelper.downloadAndInstallApk(this, game.downloadUrl, "${game.title.replace(" ", "_")}.apk")
@@ -104,10 +111,6 @@ class GameDetailActivity : AppCompatActivity() {
                 }
             } else {
                 binding.btnLaunch.visibility = View.GONE
-            }
-        } else {
-            binding.btnLaunch.setOnClickListener {
-                Snackbar.make(binding.root, "Game not available for download", Snackbar.LENGTH_SHORT).show()
             }
         }
     }
@@ -119,6 +122,7 @@ class GameDetailActivity : AppCompatActivity() {
         binding.btnLaunch.visibility = View.GONE
         binding.downloadProgressContainer.visibility = View.VISIBLE
         
+        // [Lifecycle]: Menggunakan coroutine untuk polling status unduhan secara real-time.
         lifecycleScope.launch {
             while (isPolling && currentDownloadId != -1L) {
                 val progress = DownloadHelper.getDownloadProgress(this@GameDetailActivity, currentDownloadId)
@@ -128,6 +132,7 @@ class GameDetailActivity : AppCompatActivity() {
                             isPolling = false
                             binding.downloadProgressContainer.visibility = View.GONE
                             binding.btnLaunch.visibility = View.VISIBLE
+                            // [Material Design 3 Components]: Memicu installer Android secara otomatis.
                             DownloadHelper.installApk(this@GameDetailActivity, currentDownloadId)
                             currentGame?.let { updateLaunchButton(it) }
                         }
@@ -135,7 +140,7 @@ class GameDetailActivity : AppCompatActivity() {
                             isPolling = false
                             binding.downloadProgressContainer.visibility = View.GONE
                             binding.btnLaunch.visibility = View.VISIBLE
-                            Toast.makeText(this@GameDetailActivity, "Download failed", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@GameDetailActivity, "Unduhan gagal", Toast.LENGTH_SHORT).show()
                         }
                         else -> {
                             val percent = if (progress.totalBytes > 0) {
@@ -153,34 +158,35 @@ class GameDetailActivity : AppCompatActivity() {
     }
 
     private fun showOptionsBottomSheet(game: Game) {
+        // [Bottom Sheet]: Implementasi Modal Bottom Sheet untuk pengelolaan wishlist dan data.
         val dialog = BottomSheetDialog(this)
         val view = layoutInflater.inflate(R.layout.layout_game_options_bottom_sheet, null)
         
         val wishlistText = view.findViewById<android.widget.TextView>(R.id.tvWishlistAction)
         val isInWishlist = com.example.fumbogamelauncher.util.WishlistManager.isInWishlist(this, game.id)
         
-        wishlistText.text = if (isInWishlist) "Remove from Wishlist" else "Add to Wishlist"
+        wishlistText.text = if (isInWishlist) "Hapus dari Wishlist" else "Tambah ke Wishlist"
         
         view.findViewById<View>(R.id.option_wishlist).setOnClickListener {
             if (isInWishlist) {
                 com.example.fumbogamelauncher.util.WishlistManager.removeFromWishlist(this, game.id)
-                Snackbar.make(binding.root, "Removed from Wishlist", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, "Dihapus dari Wishlist", Snackbar.LENGTH_SHORT).show()
             } else {
                 com.example.fumbogamelauncher.util.WishlistManager.addToWishlist(this, game.id)
-                Snackbar.make(binding.root, "Added to Wishlist", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, "Ditambahkan ke Wishlist", Snackbar.LENGTH_SHORT).show()
             }
             dialog.dismiss()
         }
         
         view.findViewById<View>(R.id.option_delete).setOnClickListener {
-            // [Material Design 3: Dialog]: Confirmation for important action
+            // [Dialog]: Menggunakan MaterialAlertDialog untuk konfirmasi aksi penting penghapusan data.
             MaterialAlertDialogBuilder(this)
-                .setTitle("Delete Game?")
-                .setMessage("Are you sure you want to delete ${game.title} data?")
-                .setPositiveButton("Delete") { _, _ ->
-                    Snackbar.make(binding.root, "Data deleted", Snackbar.LENGTH_SHORT).show()
+                .setTitle("Hapus Game?")
+                .setMessage("Apakah Anda yakin ingin menghapus data ${game.title}?")
+                .setPositiveButton("Hapus") { _, _ ->
+                    Snackbar.make(binding.root, "Data berhasil dihapus", Snackbar.LENGTH_SHORT).show()
                 }
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton("Batal", null)
                 .show()
             dialog.dismiss()
         }
@@ -191,13 +197,14 @@ class GameDetailActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Refresh the launch button state when returning to the activity
+        // [Lifecycle]: Memperbarui status tombol saat pengguna kembali ke layar ini.
         currentGame?.let { updateLaunchButton(it) }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        isPolling = false // Stop polling when activity is destroyed
+        // [Lifecycle]: Menghentikan polling saat activity dihancurkan.
+        isPolling = false
     }
 
     companion object {

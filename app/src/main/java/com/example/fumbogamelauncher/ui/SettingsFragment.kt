@@ -11,7 +11,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 
 /**
- * [Fragment & Lifecycle]: Fragment managing application settings.
+ * [Fragment dan Lifecycle]: Fragmen modular untuk mengelola pengaturan aplikasi.
  */
 class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
@@ -22,27 +22,34 @@ class SettingsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // [Slicing UI]: Menggunakan ViewBinding untuk mengikat tata letak XML.
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+    /**
+     * [Lifecycle]: Inisialisasi logika pengaturan di onViewCreated.
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        // Memuat status tema yang tersimpan.
         binding.switchDarkMode.isChecked = ThemeHelper.isDarkMode(requireContext())
         
         binding.switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
+            // [Dialog]: Menggunakan MaterialAlertDialog untuk konfirmasi perubahan tema aplikasi.
             MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Change Theme?")
-                .setMessage("Are you sure you want to change the app theme?")
-                .setPositiveButton("Yes") { _, _ ->
+                .setTitle("Ganti Tema?")
+                .setMessage("Apakah Anda yakin ingin mengubah tema aplikasi?")
+                .setPositiveButton("Ya") { _, _ ->
                     ThemeHelper.setDarkMode(requireContext(), isChecked)
-                    Snackbar.make(binding.root, "Theme updated!", Snackbar.LENGTH_SHORT).show()
-                    // Recreate is handled by setDefaultNightMode in most cases, 
-                    // but for immediate effect in this setup:
+                    // [Snackbar]: Memberikan feedback instan setelah tema diperbarui.
+                    Snackbar.make(binding.root, "Tema berhasil diperbarui!", Snackbar.LENGTH_SHORT).show()
+                    
+                    // Melakukan refresh aktivitas untuk menerapkan tema baru secara menyeluruh.
                     requireActivity().recreate()
                 }
-                .setNegativeButton("Cancel") { _, _ ->
+                .setNegativeButton("Batal") { _, _ ->
                     binding.switchDarkMode.isChecked = !isChecked
                 }
                 .show()
@@ -51,6 +58,7 @@ class SettingsFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // [Lifecycle]: Membersihkan referensi binding untuk mencegah kebocoran memori.
         _binding = null
     }
 }
